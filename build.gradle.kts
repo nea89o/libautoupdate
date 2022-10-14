@@ -64,5 +64,13 @@ publishing {
             }
         }
     }
-    repositories { }
+    repositories {
+        maven("https://repo.nea.moe/releases") {
+            name = "neamoeReleases"
+            credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+    }
 }
