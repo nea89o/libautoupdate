@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A Utility class for setting up the exit hook, which then launches the next stage (postexit) using the same java runtime.
+ */
 public class ExitHookInvoker {
 
     private static boolean isExitHookRegistered = false;
@@ -11,7 +14,15 @@ public class ExitHookInvoker {
     private static File updaterJar;
     private static boolean cancelled = false;
 
-
+    /**
+     * Set up the exit hook to run post exit actions.
+     *
+     * <p><b>N.B.:</b> Calling this multiple times will only invoke the last set of actions.
+     * In case of multiple updates the update actions should be joined in the same list.</p>
+     *
+     * @param updaterJar the extracted updater jar
+     * @param actions    the actions to execute
+     */
     public static synchronized void setExitHook(File updaterJar, List<UpdateAction> actions) {
         if (!isExitHookRegistered) {
             Runtime.getRuntime().addShutdownHook(new Thread(ExitHookInvoker::runExitHook));
@@ -23,7 +34,10 @@ public class ExitHookInvoker {
         ExitHookInvoker.updaterJar = updaterJar;
     }
 
-    public static synchronized void cancelUpdate() {
+    /**
+     * Cancel the exit hook, invalidating any previous calls to {@link #setExitHook}
+     */
+    public static synchronized void cancelExitHook() {
         cancelled = true;
     }
 

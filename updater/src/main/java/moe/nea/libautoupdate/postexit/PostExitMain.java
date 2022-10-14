@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public class PostExitMain {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         File outputFile = new File(".autoupdates", "postexit.log");
         outputFile.getParentFile().mkdirs();
         PrintStream printStream = new PrintStream(new FileOutputStream(outputFile, true));
@@ -18,13 +18,15 @@ public class PostExitMain {
         for (int i = 0; i < args.length; i++) {
             switch (args[i].intern()) {
                 case "delete":
-                    File file = new File(args[++i]);
+                    File file = unlockedFile(args[++i]);
                     System.out.println("Deleting " + file);
-                    file.delete();
+                    if (!file.delete()) {
+                        System.out.println("Failed to delete " + file);
+                    }
                     break;
                 case "move":
-                    File from = new File(args[++i]);
-                    File to = new File(args[++i]);
+                    File from = unlockedFile(args[++i]);
+                    File to = unlockedFile(args[++i]);
                     System.out.println("Moving " + from + " to " + to);
                     // Use Files.move instead of File.renameTo, since renameTo is not well-defined.
                     Files.move(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -36,11 +38,14 @@ public class PostExitMain {
         }
     }
 
-    public void unlockedFile(File file) throws InterruptedException {
-        while (!file.exists() || !file.renameTo(file)) {
+    public static File unlockedFile(String name) throws InterruptedException {
+        File file = new File(name);
+        while (file.exists() && !file.renameTo(file)) {
+            System.out.println("Waiting on a process to relinquish access to " + file);
             Thread.sleep(1000L);
         }
         file.getParentFile().mkdirs();
+        return file;
     }
 
 }

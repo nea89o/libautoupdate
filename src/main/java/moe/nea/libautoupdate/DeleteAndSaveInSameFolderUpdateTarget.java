@@ -7,8 +7,14 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Create {@link UpdateTarget} that deletes the specified Jar, and saves the new Jar in the same folder with the name specified by the download URL.
+ */
 @Value
 public class DeleteAndSaveInSameFolderUpdateTarget implements UpdateTarget {
+    /**
+     * The file that will be replaced.
+     */
     File file;
 
     @SneakyThrows

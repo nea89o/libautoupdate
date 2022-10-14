@@ -14,15 +14,29 @@ import java.util.concurrent.CompletionException;
 
 @Value
 public class PotentialUpdate {
+    /**
+     * The update data of this update.
+     */
     UpdateData update;
+    /**
+     * The context of this update.
+     */
     UpdateContext context;
+    /**
+     * A UUID so that each update does not conflict which each other.
+     */
     UUID updateUUID = UUID.randomUUID();
 
+    /**
+     * @return the directory in which update data gets stored for the post exit stage.
+     */
     public File getUpdateDirectory() {
         return new File(".autoupdates", context.getIdentifier() + "/" + updateUUID);
     }
 
-
+    /**
+     * @return true if an update exists and has a higher version number than our current version.
+     */
     public boolean isUpdateAvailable() {
         if (update == null) return false;
         return update.getVersionNumber() > context.getCurrentVersion().getCurrentVersionNumber();
@@ -33,16 +47,25 @@ public class PotentialUpdate {
         return new File(getUpdateDirectory(), name);
     }
 
+    /**
+     * @return the location where the updated jar will be stored.
+     */
     public File getUpdateJarStorage() {
         return getFile("next.jar");
     }
 
+    /**
+     * @return the filename of the updated jar, as specified by the {@link UpdateData#getDownload()}
+     * @throws MalformedURLException if {@link #update} contains an invalid download url.
+     */
     public String getFileName() throws MalformedURLException {
         val split = update.getDownloadAsURL().getPath().split("/");
         return split[split.length - 1];
     }
 
-
+    /**
+     * Extracts the updater jar (for the post exit stage) into the storage directory.
+     */
     public void extractUpdater() throws IOException {
         val file = getFile("updater.jar");
         try (val from = getClass().getResourceAsStream("/updater.jar");
@@ -51,6 +74,9 @@ public class PotentialUpdate {
         }
     }
 
+    /**
+     * Download the updated jar into the storage directory.
+     */
     public void downloadUpdate() throws IOException {
         try (val from = update.getDownloadAsURL().openStream();
              val to = new FileOutputStream(getUpdateJarStorage())) {
@@ -67,19 +93,29 @@ public class PotentialUpdate {
         }
     }
 
+    /**
+     * Prepare the layout of the storage directory.
+     */
     public void prepareUpdate() throws IOException {
         extractUpdater();
         downloadUpdate();
     }
 
-
+    /**
+     * Execute the update.
+     * This is done by first preparing the storage directory using {@link #prepareUpdate()} and then setting the {@link ExitHookInvoker}
+     */
     public void executeUpdate() throws IOException {
         prepareUpdate();
         ExitHookInvoker.setExitHook(getFile("updater.jar"),
                 context.getTarget().generateUpdateActions(this));
     }
 
-
+    /**
+     * Execute the update in another thread.
+     *
+     * @return a future which is completed when the update is downloaded and hooked on exit.
+     */
     public CompletableFuture<Void> launchUpdate() {
         return CompletableFuture.supplyAsync(() -> {
             try {
