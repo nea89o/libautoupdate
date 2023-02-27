@@ -14,8 +14,8 @@ public class PostExitMain {
         PrintStream printStream = new PrintStream(new FileOutputStream(outputFile, true));
         System.setErr(printStream);
         System.setOut(printStream);
-
-        for (int i = 0; i < args.length; i++) {
+        System.out.println("Starting update (with identifier " + args[0] + " and uuid " + args[1] + ")");
+        for (int i = 2; i < args.length; i++) {
             switch (args[i].intern()) {
                 case "delete":
                     File file = unlockedFile(args[++i]);

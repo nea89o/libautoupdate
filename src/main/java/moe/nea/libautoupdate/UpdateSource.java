@@ -11,6 +11,13 @@ public interface UpdateSource {
     }
 
     /**
+     * Create a {@link GithubReleaseUpdateSource}.
+     */
+    static UpdateSource githubUpdateSource(String owner, String repository) {
+        return new GithubReleaseUpdateSource(owner, repository);
+    }
+
+    /**
      * Check for updates in the given update stream.
      *
      * @param updateStream the update stream to check for updates.

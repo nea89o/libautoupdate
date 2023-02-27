@@ -1,15 +1,16 @@
 package moe.nea.libautoupdate;
 
+import com.google.gson.Gson;
 import lombok.val;
 import lombok.var;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,10 +19,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class UpdateUtils {
     private UpdateUtils() {
     }
+
+    static final Gson gson = new Gson();
 
     public static File getJarFileContainingClass(Class<?> clazz) {
         val location = clazz.getProtectionDomain().getCodeSource().getLocation();
@@ -82,5 +87,18 @@ public class UpdateUtils {
             }
         });
     }
+
+    public static <T> CompletableFuture<T> httpGet(String url, Gson gson, Type clazz) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                try (val is = new URL(url).openStream()) {
+                    return gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), clazz);
+                }
+            } catch (IOException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
 }
 

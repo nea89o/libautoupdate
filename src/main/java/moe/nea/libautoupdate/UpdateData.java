@@ -1,5 +1,6 @@
 package moe.nea.libautoupdate;
 
+import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import java.net.URL;
 @AllArgsConstructor
 public class UpdateData {
     String versionName;
-    int versionNumber;
+    JsonElement versionNumber;
     String sha256;
     String download;
 

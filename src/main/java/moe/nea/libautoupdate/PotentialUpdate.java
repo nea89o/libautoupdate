@@ -39,7 +39,7 @@ public class PotentialUpdate {
      */
     public boolean isUpdateAvailable() {
         if (update == null) return false;
-        return update.getVersionNumber() > context.getCurrentVersion().getCurrentVersionNumber();
+        return context.getCurrentVersion().isOlderThan(update.getVersionNumber());
     }
 
     private File getFile(String name) {
@@ -84,7 +84,7 @@ public class PotentialUpdate {
         }
         try (val check = new FileInputStream(getUpdateJarStorage())) {
             val updateSha = UpdateUtils.sha256sum(check);
-            if (!update.getSha256().equalsIgnoreCase(updateSha)) {
+            if (update.getSha256() != null && !update.getSha256().equalsIgnoreCase(updateSha)) {
                 throw new UpdateException(
                         "Hash of downloaded file " + getUpdateJarStorage() +
                                 " (" + updateSha + ") does not match expected hash of " +
@@ -107,7 +107,10 @@ public class PotentialUpdate {
      */
     public void executeUpdate() throws IOException {
         prepareUpdate();
-        ExitHookInvoker.setExitHook(getFile("updater.jar"),
+        ExitHookInvoker.setExitHook(
+                getContext().getIdentifier(),
+                getUpdateUUID(),
+                getFile("updater.jar"),
                 context.getTarget().generateUpdateActions(this));
     }
 

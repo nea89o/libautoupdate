@@ -32,7 +32,7 @@ UpdateContext updateContext=new UpdateContext(
         );
 ```
 
-You will have to specify an update source (currently either a `gistSource` or your own implementation),
+You will have to specify an update source,
 an update target (the file to replace), the version that is currently being ran, and a string id to prevent
 files from being overwritten.
 
@@ -42,7 +42,7 @@ application.
 
 ### Sources
 
- - GistSource
+ - Gist Source
 
 Uses a gist with multiple (or just one) files called `<upstream>.json` in the format
 ```json5
@@ -52,6 +52,14 @@ Uses a gist with multiple (or just one) files called `<upstream>.json` in the fo
 , "download": "https://github.com/NotEnoughUpdates/NotEnoughUpdates/releases/download/v2.1-rc7/NotEnoughUpdates-2.1-blahaj-rc7.jar" // The download url of this version
 }
 ```
+
+ - GitHub Releases Source
+
+Uses a GitHub release to either source a pre-release or full-release JAR. This release source does not support hashes or
+newer-than-latest local versions. The current version also has to be the tag name, unlike the gist source which can have
+any version type. The GitHub release needs to have a tag that is also present in the jar itself, and there should only 
+be one JAR in each GitHub release. Subclasses of this source may provide custom logic for choosing the jar / version.
+
 
 ### Targets
 

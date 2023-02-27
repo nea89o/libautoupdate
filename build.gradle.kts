@@ -1,11 +1,13 @@
+
 plugins {
     `maven-publish`
     signing
     java
+    id("io.freefair.lombok") version "6.5.1"
 }
 
 group = "moe.nea"
-version = "0.1.0"
+version = "1.0.0"
 
 allprojects {
     apply(plugin = "java")
@@ -32,11 +34,18 @@ project(":updater") {
 }
 
 dependencies {
-    compileOnly("org.projectlombok:lombok:1.18.24")
-    annotationProcessor("org.projectlombok:lombok:1.18.24")
+    @Suppress("VulnerableLibrariesLocal")
+    // We use this version of gson, because this is intended to be used for minecraft 1.8.9 (which bundles that gson version)
     implementation("com.google.code.gson:gson:2.2.4")
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+tasks.javadoc {
+    isFailOnError = false
+}
 
 tasks.processResources {
     val updateJar = tasks.getByPath(":updater:jar")

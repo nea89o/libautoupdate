@@ -1,6 +1,7 @@
 package moe.nea.libautoupdate;
 
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.Value;
 
 import java.util.concurrent.CompletableFuture;
@@ -8,7 +9,9 @@ import java.util.concurrent.CompletableFuture;
 @Value
 @EqualsAndHashCode(callSuper = false)
 public class GistSource extends JsonUpdateSource {
+    @NonNull
     String owner;
+    @NonNull
     String gistId;
     private static final String GIST_RAW_URL = "https://gist.githubusercontent.com/%s/%s/raw/%s.json";
 
