@@ -107,6 +107,14 @@ public class PotentialUpdate {
      */
     public void executeUpdate() throws IOException {
         prepareUpdate();
+        executePreparedUpdate();
+    }
+
+    /**
+     * Execute an already prepared update.
+     * Identical to {@link #executeUpdate()} if {@link #prepareUpdate()} was called beforehand.
+     */
+    public void executePreparedUpdate() {
         ExitHookInvoker.setExitHook(
                 getContext().getIdentifier(),
                 getUpdateUUID(),
