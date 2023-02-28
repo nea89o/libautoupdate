@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "moe.nea"
-version = "1.0.1"
+version = "1.0.2"
 
 allprojects {
     apply(plugin = "java")
