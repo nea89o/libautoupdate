@@ -88,7 +88,7 @@ public class GithubReleaseUpdateSource extends JsonUpdateSource {
     }
 
 
-    private String getReleaseApiUrl() {
+    protected String getReleaseApiUrl() {
         return String.format("https://api.github.com/repos/%s/%s/releases", owner, repository);
     }
 
