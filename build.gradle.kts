@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "moe.nea"
-version = "1.0.2"
+version = "1.0.3"
 
 allprojects {
     apply(plugin = "java")
@@ -70,15 +70,6 @@ publishing {
                 scm {
                     url.set("https://git.nea.moe/nea/libautoupdate")
                 }
-            }
-        }
-    }
-    repositories {
-        maven("https://repo.nea.moe/releases") {
-            name = "neamoeReleases"
-            credentials(PasswordCredentials::class)
-            authentication {
-                create<BasicAuthentication>("basic")
             }
         }
     }

@@ -49,7 +49,7 @@ public interface CurrentVersion {
 
            @Override
            public boolean isOlderThan(JsonElement element) {
-               return !new JsonPrimitive(tagName).equals(element);
+               return !element.isJsonPrimitive() || !element.getAsString().equalsIgnoreCase(tagName);
            }
 
            @Override
