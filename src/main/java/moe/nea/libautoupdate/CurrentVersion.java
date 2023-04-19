@@ -36,7 +36,8 @@ public interface CurrentVersion {
     }
 
     /**
-     * Create a {@link CurrentVersion} that uses git tag names. Any difference in tag name will be treated as newer.
+     * Create a {@link CurrentVersion} that uses string tag names. Any difference in tag name will treat the current
+     * version as outdated..
      *
      * @param tagName the current tag name
      */

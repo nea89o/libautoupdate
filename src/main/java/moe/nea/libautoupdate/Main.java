@@ -4,9 +4,9 @@ public class Main {
     public static void main(String[] args) {
 
         UpdateContext updater = new UpdateContext(
-                UpdateSource.githubUpdateSource("NotEnoughUpdates", "NotEnoughUpdates"),
+                UpdateSource.mavenSource("https://repo.nea.moe/releases", "moe.nea", "neuhax"),
                 UpdateTarget.deleteAndSaveInTheSameFolder(Main.class),
-                CurrentVersion.ofTag("v2.1.1-pre1"),
+                CurrentVersion.ofTag("1.1.0"),
                 "test"
         );
         updater.cleanup();

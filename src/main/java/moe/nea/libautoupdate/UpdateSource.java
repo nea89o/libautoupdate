@@ -6,6 +6,13 @@ import java.util.concurrent.CompletableFuture;
  * UpdateSource is an interface to check for updates in an update stream.
  */
 public interface UpdateSource {
+    /**
+     * Create a {@link MavenSource}. Construct directly for more control
+     */
+    static MavenSource mavenSource(String repository, String moduleId, String artifactId) {
+        return new MavenSource(repository, moduleId, artifactId, "", "jar");
+    }
+
     static UpdateSource gistSource(String owner, String gistId) {
         return new GistSource(owner, gistId);
     }
