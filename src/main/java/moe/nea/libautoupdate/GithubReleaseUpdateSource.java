@@ -64,11 +64,16 @@ public class GithubReleaseUpdateSource extends JsonUpdateSource {
         if (release.getAssets() == null) return null;
         return release.getAssets().stream()
                 .filter(it -> (Objects.equals(it.getContentType(), "application/x-java-archive") || (it.getName() != null && it.getName().endsWith(".jar"))) && it.getBrowserDownloadUrl() != null)
-                .map(it -> new UpdateData(
+                .map(it -> new GithubReleaseUpdateData(
                         release.getName() == null ? release.getTagName() : release.getName(),
                         new JsonPrimitive(release.getTagName()),
                         null,
-                        it.getBrowserDownloadUrl()
+                        it.getBrowserDownloadUrl(),
+                        release.getBody(),
+                        release.getTargetCommitish(),
+                        release.getCreated_at(),
+                        release.getPublishedAt(),
+                        release.getHtmlUrl()
                 ))
                 .findFirst().orElse(null);
     }

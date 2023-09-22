@@ -4,7 +4,7 @@ public class Main {
     public static void main(String[] args) {
 
         UpdateContext updater = new UpdateContext(
-                UpdateSource.mavenSource("https://repo.nea.moe/releases", "moe.nea", "neuhax"),
+                UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
                 UpdateTarget.deleteAndSaveInTheSameFolder(Main.class),
                 CurrentVersion.ofTag("1.1.0"),
                 "test"
