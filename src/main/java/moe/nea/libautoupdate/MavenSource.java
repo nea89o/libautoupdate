@@ -44,7 +44,7 @@ public class MavenSource implements UpdateSource {
         dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         var db = dbf.newDocumentBuilder();
         return CompletableFuture.supplyAsync(() -> {
-            try (val is = new URL(getMavenMetadataUrl()).openStream()) {
+            try (val is = UpdateUtils.openUrlConnection(new URL(getMavenMetadataUrl()))) {
                 var document = db.parse(new InputSource(is));
                 var metadata = (Element) document.getDocumentElement();
                 var versioning = (Element) metadata.getElementsByTagName("versioning").item(0);

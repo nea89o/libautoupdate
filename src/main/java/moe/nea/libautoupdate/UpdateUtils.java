@@ -7,7 +7,10 @@ import lombok.var;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
-import java.net.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -70,6 +73,13 @@ public class UpdateUtils {
         }
     }
 
+    public static InputStream openUrlConnection(URL url) throws IOException {
+        val conn = url.openConnection();
+        if (connectionPatcher != null)
+            connectionPatcher.accept(conn);
+        return conn.getInputStream();
+    }
+
     public static void deleteDirectory(Path path) throws IOException {
         if (!Files.exists(path)) return;
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -89,24 +99,20 @@ public class UpdateUtils {
 
     private static Consumer<URLConnection> connectionPatcher = null;
 
+    /**
+     * Insert a connection patcher, which can modify connections before they are read from.
+     */
     public static void patchConnection(Consumer<URLConnection> connectionPatcher) {
         UpdateUtils.connectionPatcher = connectionPatcher;
     }
 
     public static <T> CompletableFuture<T> httpGet(String url, Gson gson, Type clazz) {
         return CompletableFuture.supplyAsync(() -> {
-            URLConnection conn = null;
             try {
-                conn = new URL(url).openConnection();
-                if (connectionPatcher != null)
-                    connectionPatcher.accept(conn);
-                try (val is = conn.getInputStream()) {
+                try (val is = openUrlConnection(new URL(url))) {
                     return gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), clazz);
                 }
             } catch (IOException e) {
-                if (conn instanceof HttpURLConnection) {
-                    ((HttpURLConnection) conn).disconnect();
-                }
                 throw new CompletionException(e);
             }
         });

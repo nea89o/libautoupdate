@@ -78,7 +78,7 @@ public class PotentialUpdate {
      * Download the updated jar into the storage directory.
      */
     public void downloadUpdate() throws IOException {
-        try (val from = update.getDownloadAsURL().openStream();
+        try (val from = UpdateUtils.openUrlConnection(update.getDownloadAsURL());
              val to = new FileOutputStream(getUpdateJarStorage())) {
             UpdateUtils.connect(from, to);
         }
