@@ -7,9 +7,7 @@ import lombok.var;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -21,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Consumer;
 
 public class UpdateUtils {
     private UpdateUtils() {
@@ -88,13 +87,26 @@ public class UpdateUtils {
         });
     }
 
+    private static Consumer<URLConnection> connectionPatcher = null;
+
+    public static void patchConnection(Consumer<URLConnection> connectionPatcher) {
+        UpdateUtils.connectionPatcher = connectionPatcher;
+    }
+
     public static <T> CompletableFuture<T> httpGet(String url, Gson gson, Type clazz) {
         return CompletableFuture.supplyAsync(() -> {
+            URLConnection conn = null;
             try {
-                try (val is = new URL(url).openStream()) {
+                conn = new URL(url).openConnection();
+                if (connectionPatcher != null)
+                    connectionPatcher.accept(conn);
+                try (val is = conn.getInputStream()) {
                     return gson.fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), clazz);
                 }
             } catch (IOException e) {
+                if (conn instanceof HttpURLConnection) {
+                    ((HttpURLConnection) conn).disconnect();
+                }
                 throw new CompletionException(e);
             }
         });
