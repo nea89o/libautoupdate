@@ -60,6 +60,11 @@ newer-than-latest local versions. The current version also has to be the tag nam
 any version type. The GitHub release needs to have a tag that is also present in the jar itself, and there should only 
 be one JAR in each GitHub release. Subclasses of this source may provide custom logic for choosing the jar / version.
 
+ - Maven Releases Source
+
+Uses the maven-metadata.xml in a given maven repository at a given maven coordinate to find the latest version of your
+mod.
+
 
 ### Targets
 
