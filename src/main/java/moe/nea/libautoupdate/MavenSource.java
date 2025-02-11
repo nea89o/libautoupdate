@@ -31,7 +31,7 @@ public class MavenSource implements UpdateSource {
 
 	protected URI getMavenBaseUrl() {
 		var uri = URI.create(repoUrl);
-		for (String modulePart : UpdateUtils.stringSplitIterator(module, "/")) {
+		for (String modulePart : UpdateUtils.stringSplitIterator(module, ".")) {
 			uri = uri.resolve(UpdateUtils.urlEncode(modulePart));
 		}
 		uri = uri.resolve(UpdateUtils.urlEncode(artifact));
