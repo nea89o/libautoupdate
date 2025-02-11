@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
+import java.net.URI;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;

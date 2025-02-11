@@ -22,7 +22,7 @@ public class DeleteAndSaveInSameFolderUpdateTarget implements UpdateTarget {
     public List<UpdateAction> generateUpdateActions(PotentialUpdate update) {
         return Arrays.asList(
                 new UpdateAction.DeleteFile(file),
-                new UpdateAction.MoveDownloadedFile(update.getUpdateJarStorage(), new File(file.getParentFile(), update.getFileName()))
+                new UpdateAction.MoveDownloadedFile(update.getUpdateJarStorage(), UpdateUtils.getContainedFile(file.getParentFile(), update.getFileName()))
         );
     }
 }

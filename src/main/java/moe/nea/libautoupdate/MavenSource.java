@@ -7,8 +7,8 @@ import org.xml.sax.InputSource;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.net.URI;
 import java.net.URL;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -29,16 +29,26 @@ public class MavenSource implements UpdateSource {
 	String classifier;
 	String extension;
 
-	protected String getMavenBaseUrl() {
-		return String.format("%s/%s/%s", repoUrl, module.replace('.', '/'), artifact);
+	protected URI getMavenBaseUrl() {
+		var uri = URI.create(repoUrl);
+		for (String modulePart : UpdateUtils.stringSplitIterator(module, "/")) {
+			uri = uri.resolve(UpdateUtils.urlEncode(modulePart));
+		}
+		uri = uri.resolve(UpdateUtils.urlEncode(artifact));
+		return uri;
 	}
 
-	protected String getMavenMetadataUrl() {
-		return getMavenBaseUrl() + "/maven-metadata.xml";
+	protected URI getMavenMetadataUrl() {
+		return getMavenBaseUrl().resolve("maven-metadata.xml");
 	}
 
-	protected String getMavenArtifactUrl(String version) {
-		return String.format("%s/%s/%s-%s%s%s.%s", getMavenBaseUrl(), version, artifact, version, classifier.isEmpty() ? "" : "-", classifier, extension);
+	protected String getFileName(String version) {
+		return String.format("%s-%s%s%s.%s", artifact, version, classifier.isEmpty() ? "" : "-", classifier, extension);
+	}
+
+	protected URI getMavenArtifactUrl(String version) {
+		return getMavenBaseUrl().resolve(UpdateUtils.urlEncode(version))
+		                        .resolve(UpdateUtils.urlEncode(getFileName(version)));
 	}
 
 	@SneakyThrows
@@ -48,7 +58,7 @@ public class MavenSource implements UpdateSource {
 		dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 		var db = dbf.newDocumentBuilder();
 		return CompletableFuture.supplyAsync(() -> {
-			try (val is = UpdateUtils.openUrlConnection(new URL(getMavenMetadataUrl()))) {
+			try (val is = UpdateUtils.openUrlConnection(getMavenMetadataUrl().toURL())) {
 				var document = db.parse(new InputSource(is));
 				var metadata = (Element) document.getDocumentElement();
 				var versioning = (Element) metadata.getElementsByTagName("versioning").item(0);
@@ -62,7 +72,7 @@ public class MavenSource implements UpdateSource {
 						latestVersion,
 						new JsonPrimitive(latestVersion),
 						null,
-						getMavenArtifactUrl(latestVersion)
+						getMavenArtifactUrl(latestVersion).toString()
 				);
 			} catch (Exception e) {
 				throw new CompletionException(e);

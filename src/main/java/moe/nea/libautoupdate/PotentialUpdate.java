@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -56,11 +57,11 @@ public class PotentialUpdate {
 
     /**
      * @return the filename of the updated jar, as specified by the {@link UpdateData#getDownload()}
-     * @throws MalformedURLException if {@link #update} contains an invalid download url.
+     * @throws URISyntaxException if {@link #update} contains an invalid download url.
      */
-    public String getFileName() throws MalformedURLException {
-        val split = update.getDownloadAsURL().getPath().split("/");
-        return split[split.length - 1];
+    public String getFileName() throws URISyntaxException {
+        val fileName = update.getRawFileName();
+        return UpdateUtils.sanitizeFileName(fileName);
     }
 
     /**
